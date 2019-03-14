@@ -2,14 +2,13 @@ package graph
 
 import (
 	"fmt"
-	"sort"
 )
 
 type GraphType string
 
 type GraphInterface interface {
 	AddEdge(src, dst *Vertex) error
-	Sort() ([]*Vertex, error)
+	TopoSort() ([]*Vertex, error)
 	BFS() []*Vertex
 	DFS() []*Vertex
 	Type() GraphType
@@ -32,31 +31,35 @@ func (s VertexSlice) Swap(i, j int) {
 }
 
 func (s VertexSlice) Less(i, j int) bool {
-	return s[i].Id < s[j].Id
+	return s[i].Indegree < s[j].Indegree
 }
 
 type Vertex struct {
-	Id        int
+	// meta data
+	Id        string
 	Data      interface{}
+	// graph data
+	Index     int
 	FirstEdge *Edge
 	Indegree  int
 	Outdegree int
+	// state data
 	State     VertexState
 	Executor  ExecutorFunc
 }
 
-func NewVertex(id int) *Vertex {
+func NewVertex(id string) *Vertex {
 	return &Vertex{Id: id}
 }
 
 func (v *Vertex) Adjoin(dst *Vertex) error {
 	if dst.Id == v.Id {
-		return fmt.Errorf("vertex id[%d] conflict", v.Id)
+		return fmt.Errorf("vertex id[%s] conflict", v.Id)
 	}
 
 	if nil == v.FirstEdge {
 		v.FirstEdge = &Edge{
-			VertexId: dst.Id,
+			AdjIndex: dst.Index,
 		}
 	} else {
 		edge := v.FirstEdge
@@ -67,7 +70,7 @@ func (v *Vertex) Adjoin(dst *Vertex) error {
 			edge = edge.NextEdge
 		}
 		edge.NextEdge = &Edge{
-			VertexId: dst.Id,
+			AdjIndex: dst.Index,
 		}
 	}
 
@@ -80,20 +83,23 @@ func (v *Vertex) Adjoin(dst *Vertex) error {
 type EdgeState string
 
 type Edge struct {
-	State    EdgeState
+	// meta data
 	Weight   int
-	VertexId int
+	// graph data
+	AdjIndex int
 	NextEdge *Edge
+	// state data
+	State    EdgeState
 }
 
 type Graph struct {
-	vertexMap  map[int]*Vertex
+	vertexMap  map[string]*Vertex
 	Vertexlist VertexSlice
 }
 
 func NewGraph() Graph {
 	return Graph{
-		vertexMap: make(map[int]*Vertex),
+		vertexMap: make(map[string]*Vertex),
 	}
 }
 
@@ -104,6 +110,7 @@ func (g *Graph) AddEdge(src, dst *Vertex) error {
 	if !ok || v != src {
 		g.vertexMap[src.Id] = src
 		g.vertexMap[src.Id].Outdegree = 0
+		g.vertexMap[src.Id].Index = len(g.Vertexlist)
 		g.Vertexlist = append(g.Vertexlist, g.vertexMap[src.Id])
 	}
 	g.vertexMap[src.Id].Outdegree++
@@ -113,6 +120,7 @@ func (g *Graph) AddEdge(src, dst *Vertex) error {
 	if !ok || v != dst {
 		g.vertexMap[dst.Id] = dst
 		g.vertexMap[dst.Id].Indegree = 0
+		g.vertexMap[dst.Id].Index = len(g.Vertexlist)
 		g.Vertexlist = append(g.Vertexlist, g.vertexMap[dst.Id])
 	}
 	g.vertexMap[dst.Id].Indegree++
@@ -123,13 +131,10 @@ func (g *Graph) AddEdge(src, dst *Vertex) error {
 	return nil
 }
 
-func (g *Graph) SortId() error {
-	sort.Sort(g.Vertexlist)
-	return nil
-}
+func (g *Graph) TopoSort() (vertexList []Vertex, err error) {
 
-func (g *Graph) SortTopo() ([]*Vertex, error) {
-	vertexList := []*Vertex{}
+	
+
 	return vertexList, nil
 }
 
