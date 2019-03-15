@@ -1,8 +1,12 @@
 package graph
 
 import (
+	"container/list"
 	"fmt"
+	//"sort"
 )
+
+var l = list.New()
 
 type GraphType string
 
@@ -14,7 +18,7 @@ type GraphInterface interface {
 	Type() GraphType
 }
 
-type ExecutorFunc func(interface{}) (interface{}, error)
+type ExecutorFunc func(...interface{}) (interface{}, error)
 
 type VertexState string
 
@@ -31,21 +35,22 @@ func (s VertexSlice) Swap(i, j int) {
 }
 
 func (s VertexSlice) Less(i, j int) bool {
-	return s[i].Indegree < s[j].Indegree
+	return s[i].Index < s[j].Index
 }
 
 type Vertex struct {
 	// meta data
-	Id        string
-	Data      interface{}
+	Id   string
+	Data interface{}
 	// graph data
 	Index     int
-	FirstEdge *Edge
+	InEdge    *Edge
+	OutEdge   *Edge
 	Indegree  int
 	Outdegree int
 	// state data
-	State     VertexState
-	Executor  ExecutorFunc
+	State    VertexState
+	Executor ExecutorFunc
 }
 
 func NewVertex(id string) *Vertex {
@@ -57,12 +62,12 @@ func (v *Vertex) Adjoin(dst *Vertex) error {
 		return fmt.Errorf("vertex id[%s] conflict", v.Id)
 	}
 
-	if nil == v.FirstEdge {
-		v.FirstEdge = &Edge{
+	if nil == v.OutEdge {
+		v.OutEdge = &Edge{
 			AdjIndex: dst.Index,
 		}
 	} else {
-		edge := v.FirstEdge
+		edge := v.OutEdge
 		for {
 			if nil == edge.NextEdge {
 				break
@@ -84,12 +89,12 @@ type EdgeState string
 
 type Edge struct {
 	// meta data
-	Weight   int
+	Weight int
 	// graph data
 	AdjIndex int
 	NextEdge *Edge
 	// state data
-	State    EdgeState
+	State EdgeState
 }
 
 type Graph struct {
@@ -131,11 +136,45 @@ func (g *Graph) AddEdge(src, dst *Vertex) error {
 	return nil
 }
 
-func (g *Graph) TopoSort() (vertexList []Vertex, err error) {
+func (g *Graph) TopoSort() (sortIndexList []int, err error) {
+	indgreeList := []int{}
 
-	
+	// put all indegree in list
+	for _, v := range g.Vertexlist {
+		indgreeList = append(indgreeList, v.Indegree)
+	}
 
-	return vertexList, nil
+	// find 0 indgree index
+	for i, d := range indgreeList {
+		if 0 == d {
+			sortIndexList = append(sortIndexList, i)
+		}
+	}
+
+	// 0 indgree adjoin vertex degree minus 1
+	// TODO: need to be more elegant
+	for i := 0; i < len(sortIndexList); i++ {
+		// get index
+		index := sortIndexList[i]
+
+		v := g.Vertexlist[index]
+		edge := v.OutEdge
+		for {
+			if nil == edge {
+				break
+			}
+
+			indgreeList[edge.AdjIndex]--
+			if 0 == indgreeList[edge.AdjIndex] {
+				sortIndexList = append(sortIndexList, edge.AdjIndex)
+			}
+
+			edge = edge.NextEdge
+		}
+	}
+
+	//sort.Sort(g.Vertexlist)
+	return sortIndexList, nil
 }
 
 func (g *Graph) BFS() (sortOut []*Vertex) {
