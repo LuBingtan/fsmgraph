@@ -83,18 +83,10 @@ func (vec *SimpleVector) Remove(index int) interface{} {
 }
 
 func (vec *SimpleVector) Popback() interface{} {
-	defer vec.lock.Unlock()
-
-	vec.lock.Lock()
-
 	return vec.Remove(len(vec.data) - 1)
 }
 
 func (vec *SimpleVector) Popfront() interface{} {
-	defer vec.lock.Unlock()
-
-	vec.lock.Lock()
-
 	return vec.Remove(0)
 }
 
