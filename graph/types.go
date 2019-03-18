@@ -163,7 +163,7 @@ func NewGraph() Graph {
 	}
 }
 
-func (g *Graph)Size() int {
+func (g *Graph) Size() int {
 	return g.vertexVector.Len()
 }
 

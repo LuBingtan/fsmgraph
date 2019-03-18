@@ -1,5 +1,7 @@
 package graph
+
 import simpleSt "fsmgraph-lib/simplestructure"
+
 func (g *Graph) TopoSort() (sortVertexList []*Vertex, err error) {
 	indgreeList := []int{}
 	indexQueue := simpleSt.NewSimpleQueue()
@@ -55,7 +57,7 @@ func (g *Graph) TopoSort() (sortVertexList []*Vertex, err error) {
 }
 
 func (g *Graph) BFS(startPointId string) (sortVertexList []*Vertex) {
-	
+
 	return
 }
 
