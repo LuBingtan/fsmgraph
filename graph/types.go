@@ -63,6 +63,9 @@ func (v *Vertex) AddNext(next *Vertex) {
 	} else {
 		edge := v.OutEdge
 		for {
+			if next == edge.AdjVertex {
+				return
+			}
 			if nil == edge.NextEdge {
 				break
 			}
@@ -83,7 +86,7 @@ func (v *Vertex) AddPrev(prev *Vertex) {
 	} else {
 		edge := v.InEdge
 		for {
-			if nil == edge.NextEdge {
+			if nil == edge.NextEdge || prev == edge.AdjVertex {
 				break
 			}
 			edge = edge.NextEdge
@@ -160,6 +163,10 @@ func NewGraph() Graph {
 	}
 }
 
+func (g *Graph)Size() int {
+	return g.vertexVector.Len()
+}
+
 func (g *Graph) InsertVertex(id string, data interface{}) *Vertex {
 	v := NewVertex(id, data)
 
@@ -175,6 +182,23 @@ func (g *Graph) InsertVertex(id string, data interface{}) *Vertex {
 	}
 
 	return v
+}
+
+func (g *Graph) GetVertex(id string) *Vertex {
+	index, ok := g.vertexMap[id]
+	if !ok {
+		return nil
+	}
+
+	return g.vertexVector.At(index).(*Vertex)
+}
+
+func (g *Graph) GetVertexByIndex(index int) *Vertex {
+	v := g.vertexVector.At(index)
+	if v == nil {
+		return nil
+	}
+	return v.(*Vertex)
 }
 
 func (g *Graph) DeleteVertex(id string) error {
@@ -196,84 +220,38 @@ func (g *Graph) DeleteVertex(id string) error {
 	return nil
 }
 
-func (g *Graph) AddEdge(src, dst *Vertex) error {
+func (g *Graph) AddEdge(src, dst string) error {
 	// if the vertex is new, set it in the vertex map
-	// set start point
-	i, ok := g.vertexMap[src.Id]
-	if !ok || i != src.Index {
-		src.Outdegree = 0
-		src.Index = len(g.Vertexlist)
-
-		g.Vertexlist = append(g.Vertexlist, src)
-		g.vertexMap[src.Id] = src.Index
+	srcVertex := g.GetVertex(src)
+	if srcVertex == nil {
+		return fmt.Errorf("unknown vertex[id:%s]", src)
 	}
-	g.Vertexlist[g.vertexMap[src.Id]].Outdegree++
 
-	// set end point
-	i, ok = g.vertexMap[dst.Id]
-	if !ok || i != dst.Index {
-		dst.Indegree = 0
-		dst.Index = len(g.Vertexlist)
-
-		g.Vertexlist = append(g.Vertexlist, dst)
-		g.vertexMap[dst.Id] = dst.Index
+	dstVertex := g.GetVertex(dst)
+	if dstVertex == nil {
+		return fmt.Errorf("unknown vertex[id:%s]", dst)
 	}
-	g.Vertexlist[g.vertexMap[dst.Id]].Indegree++
 
-	// set vertex edge
-	g.vertexMap[src.Id].Adjoin(g.vertexMap[dst.Id])
+	srcVertex.AddNext(dstVertex)
+	dstVertex.AddPrev(srcVertex)
 
 	return nil
 }
 
-func (g *Graph) TopoSort() (sortIndexList []int, err error) {
-	indgreeList := []int{}
-
-	// put all indegree in list
-	for _, v := range g.Vertexlist {
-		indgreeList = append(indgreeList, v.Indegree)
-	}
-
-	// find 0 indgree index
-	for i, d := range indgreeList {
-		if 0 == d {
-			sortIndexList = append(sortIndexList, i)
+func (g *Graph) VertexList(indexList ...int) (vertexList []*Vertex) {
+	if len(indexList) != 0 {
+		for _, index := range indexList {
+			vertexList = append(vertexList, g.GetVertexByIndex(index))
 		}
+		return vertexList
 	}
-
-	// 0 indgree adjoin vertex degree minus 1
-	// TODO: need to be more elegant
-	for i := 0; i < len(sortIndexList); i++ {
-		// get index
-		index := sortIndexList[i]
-
-		v := g.Vertexlist[index]
-		edge := v.OutEdge
-		for {
-			if nil == edge {
-				break
-			}
-
-			indgreeList[edge.AdjIndex]--
-			if 0 == indgreeList[edge.AdjIndex] {
-				sortIndexList = append(sortIndexList, edge.AdjIndex)
-			}
-
-			edge = edge.NextEdge
+	it := g.vertexVector.Iterator()
+	for {
+		next := it.Next()
+		if next == nil {
+			break
 		}
+		vertexList = append(vertexList, next.(*Vertex))
 	}
-
-	//sort.Sort(g.Vertexlist)
-	return sortIndexList, nil
-}
-
-func (g *Graph) BFS() (sortOut []*Vertex) {
-	for _, v := range g.Vertexlist {
-
-	}
-	return
-}
-
-func (g *Graph) DFS() (sortOut []*Vertex) {
-	return
+	return vertexList
 }
