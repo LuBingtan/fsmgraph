@@ -5,147 +5,6 @@ import (
 	simpleSt "fsmgraph-lib/simplestructure"
 )
 
-/*****************************************  graph interface  *****************************************/
-
-type GraphType string
-
-type GraphInterface interface {
-	// Create
-	InsertVertex(string, interface{}) *Vertex
-	InsertEdge(src, dst *Vertex) error
-
-	// Retrieve & Update
-
-	TopoSort() ([]*Vertex, error)
-	BFS() []*Vertex
-	DFS() []*Vertex
-	Type() GraphType
-}
-
-/*****************************************  vertex  *****************************************/
-
-type ExecutorFunc func(...interface{}) (interface{}, error)
-
-type VertexState string
-
-/// [Define]
-// structure for vertex
-type Vertex struct {
-	// meta data
-	Id   string
-	Data interface{}
-	// graph data
-	InEdge    *Edge
-	OutEdge   *Edge
-	Indegree  int
-	Outdegree int
-	// state data
-	State    VertexState
-	Executor ExecutorFunc
-}
-
-func NewVertex(id string, data interface{}) *Vertex {
-	return &Vertex{
-		Id:        id,
-		Data:      data,
-		InEdge:    nil,
-		OutEdge:   nil,
-		Indegree:  0,
-		Outdegree: 0,
-	}
-}
-
-func (v *Vertex) AddNext(next *Vertex) {
-	if nil == v.OutEdge {
-		v.OutEdge = &Edge{
-			AdjVertex: next,
-		}
-	} else {
-		edge := v.OutEdge
-		for {
-			if next == edge.AdjVertex {
-				return
-			}
-			if nil == edge.NextEdge {
-				break
-			}
-			edge = edge.NextEdge
-		}
-		edge.NextEdge = &Edge{
-			AdjVertex: next,
-		}
-	}
-	v.Outdegree++
-}
-
-func (v *Vertex) AddPrev(prev *Vertex) {
-	if nil == v.InEdge {
-		v.InEdge = &Edge{
-			AdjVertex: prev,
-		}
-	} else {
-		edge := v.InEdge
-		for {
-			if nil == edge.NextEdge || prev == edge.AdjVertex {
-				break
-			}
-			edge = edge.NextEdge
-		}
-		edge.NextEdge = &Edge{
-			AdjVertex: prev,
-		}
-	}
-	v.Indegree++
-}
-
-func (v *Vertex) RemoveNext() {
-	edge := v.OutEdge
-
-	for {
-		if nil == edge {
-			break
-		}
-
-		edge.AdjVertex.InEdge.AdjVertex = nil
-
-		edge = edge.NextEdge
-	}
-
-	v.OutEdge = nil
-}
-
-func (v *Vertex) RemovePrev() {
-	edge := v.InEdge
-
-	for {
-		if nil == edge {
-			break
-		}
-
-		edge.AdjVertex.OutEdge.AdjVertex = nil
-
-		edge = edge.NextEdge
-	}
-
-	v.OutEdge = nil
-}
-
-/*****************************************  edge  *****************************************/
-
-/// [Define]
-// structure for Edge
-type EdgeState string
-
-type Edge struct {
-	// meta data
-	Weight int
-	// graph data
-	AdjVertex *Vertex
-	NextEdge  *Edge
-	// state data
-	State EdgeState
-}
-
 /*****************************************  garph  *****************************************/
 
 /// [Define]
@@ -156,8 +15,8 @@ type Graph struct {
 	vertexVector *simpleSt.SimpleVector
 }
 
-func NewGraph() Graph {
-	return Graph{
+func NewGraph() *Graph {
+	return &Graph{
 		vertexMap:    make(map[string]int),
 		vertexVector: simpleSt.NewSimpleVector(),
 	}
