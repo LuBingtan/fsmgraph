@@ -5,56 +5,57 @@ import (
 )
 
 func GraphPrint(t *testing.T, g *Graph) {
-	t.Logf("Graph node number:%d\n", g.Size())
-	g.TopoSort()
-	//t.Log("=======sort=======")
-	for _, v := range g.VertexList() {
+	t.Logf("Graph node number:%d\n", len(g.Verteces()))
+
+	t.Log("=======original=======")
+	for k, v := range g.Verteces() {
 		t.Log("=========Node=========:")
-		t.Log("id:", v.Id)
-		t.Log("Indegree:", v.Indegree)
-		t.Log("Outdegree:", v.Outdegree)
-		edge := v.OutEdge
-		for {
-			if nil == edge {
-				break
-			}
-			t.Logf("edge:%v,", edge.AdjVertex)
-			edge = edge.NextEdge
+		t.Log("key:", k)
+		t.Log("id:", v.Id())
+		t.Log("Indegree:", v.Indegree())
+		t.Log("Outdegree:", v.Outdegree())
+		edges := v.Edges()
+		for _, edge := range edges {
+			t.Logf("edge:%v,", edge.Vertex())
+		}
+	}
+
+	vList, err := TopoSort(g)
+	if nil != err {
+		t.Error(err)
+	}
+	t.Log("=======sort=======")
+	for _, v := range vList {
+		t.Log("=========Node=========:")
+		t.Log("id:", v.Id())
+		t.Log("Indegree:", v.Indegree())
+		t.Log("Outdegree:", v.Outdegree())
+		edges := v.Edges()
+		for _, edge := range edges {
+			t.Logf("edge:%v,", edge.Vertex())
 		}
 	}
 }
 
 func Test4Graph4Init(t *testing.T) {
 	t.Logf("testing for graph initialize start.\n")
-	g := NewGraph()
-	g.InsertVertex("2", 2)
-	g.InsertVertex("3", 3)
-	g.InsertVertex("0", 0)
-	g.InsertVertex("1", 1)
+	// new graph
+	g := NewGraph("Graph")
+	// new vertex
+	n0 := NewVertex("node0", 0)
+	n1 := NewVertex("node1", 1)
+	n2 := NewVertex("node2", 2)
+	n3 := NewVertex("node3", 3)
+	// add vertex
+	g.InsertVertex(n0)
+	g.InsertVertex(n1)
+	g.InsertVertex(n2)
+	g.InsertVertex(n3)
+	// add edge
+	g.InsertEdge(n0, n1, NewEdge())
+	g.InsertEdge(n0, n2, NewEdge())
+	g.InsertEdge(n1, n2, NewEdge())
+	g.InsertEdge(n2, n3, NewEdge())
 
-	g.AddEdge("1", "2")
-	g.AddEdge("2", "3")
-	g.AddEdge("0", "1")
-	g.AddEdge("0", "2")
-	GraphPrint(t, g)
-
-}
-
-func Test4Graph4Delete(t *testing.T) {
-	t.Logf("testing for graph initialize start.\n")
-	g := NewGraph()
-	g.InsertVertex("2", 2)
-	g.InsertVertex("3", 3)
-	g.InsertVertex("0", 0)
-	g.InsertVertex("1", 1)
-
-	g.AddEdge("1", "2")
-	g.AddEdge("2", "3")
-	g.AddEdge("0", "1")
-	g.AddEdge("0", "2")
-
-	//GraphPrint(t, g)
-
-	g.DeleteVertex("3")
 	GraphPrint(t, g)
 }

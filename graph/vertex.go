@@ -132,7 +132,7 @@ func (v *Vertex) Execute(inputs ...interface{}) (interface{}, error) {
 // update adjacent vertex
 func (v *Vertex) Adjoin(dst VertexInterface, ei EdgeInterface) {
 	ei.SetVertex(dst)
-	v.edges.Pushback(dst)
+	v.edges.Pushback(ei)
 	v.incOutdegree()
 	dst.incIndegree()
 }

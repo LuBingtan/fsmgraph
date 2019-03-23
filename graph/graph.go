@@ -39,6 +39,13 @@ type Graph struct {
 	verteces  map[string]VertexInterface
 }
 
+func NewGraph(name string) *Graph {
+	return &Graph{
+		name:     name,
+		verteces: make(map[string]VertexInterface),
+	}
+}
+
 // update graph name
 func (g *Graph) SetName(n string) {
 	g.name = n
