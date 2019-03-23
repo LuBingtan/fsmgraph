@@ -55,7 +55,7 @@ type VertexInterface interface {
 
 /// [Define]
 // structure for vertex
-type Vertex struct {
+type AbstractVertex struct {
 	// meta data
 	vertexType VertexType
 	id         string
@@ -68,60 +68,60 @@ type Vertex struct {
 	outdegree int
 }
 
-func NewVertex(id string, data interface{}) *Vertex {
-	return &Vertex{
+func NewVertex(id string, data interface{}) *AbstractVertex {
+	return &AbstractVertex{
 		id:   id,
 		data: data,
 	}
 }
 
 // Update vertex type
-func (v *Vertex) SetType(t VertexType) {
+func (v *AbstractVertex) SetType(t VertexType) {
 	v.vertexType = t
 }
 
 // Update vertex id
-func (v *Vertex) SetId(id string) {
+func (v *AbstractVertex) SetId(id string) {
 	v.id = id
 }
 
 // Update vertex data
-func (v *Vertex) SetData(data interface{}) {
+func (v *AbstractVertex) SetData(data interface{}) {
 	v.data = data
 }
 
 // Update vertex state
-func (v *Vertex) SetState(state VertexState) {
+func (v *AbstractVertex) SetState(state VertexState) {
 	v.state = state
 }
 
 // get vertex type
-func (v *Vertex) Type() VertexType {
+func (v *AbstractVertex) Type() VertexType {
 	return v.vertexType
 }
 
 // get vertex id
-func (v *Vertex) Id() string {
+func (v *AbstractVertex) Id() string {
 	return v.id
 }
 
 // get vertex data
-func (v *Vertex) Data() interface{} {
+func (v *AbstractVertex) Data() interface{} {
 	return v.data
 }
 
 // get vertex state
-func (v *Vertex) State() VertexState {
+func (v *AbstractVertex) State() VertexState {
 	return v.state
 }
 
 // vertex behavior set
-func (v *Vertex) SetExecutor(executorFunc ExecutorFunc) {
+func (v *AbstractVertex) SetExecutor(executorFunc ExecutorFunc) {
 	v.executor = executorFunc
 }
 
 // vertex behavior execute
-func (v *Vertex) Execute(inputs ...interface{}) (interface{}, error) {
+func (v *AbstractVertex) Execute(inputs ...interface{}) (interface{}, error) {
 	if v.executor == nil {
 		return nil, fmt.Errorf("no executor.")
 	}
@@ -130,41 +130,41 @@ func (v *Vertex) Execute(inputs ...interface{}) (interface{}, error) {
 }
 
 // update adjacent vertex
-func (v *Vertex) Adjoin(dst VertexInterface, ei EdgeInterface) {
+func (v *AbstractVertex) Adjoin(dst VertexInterface, ei EdgeInterface) {
 	ei.SetVertex(dst)
-	v.edges.Pushback(dst)
+	v.edges.Pushback(ei)
 	v.incOutdegree()
 	dst.incIndegree()
 }
 
 // update edge
-func (v *Vertex) SetEdge(dst VertexInterface, ei EdgeInterface) {
+func (v *AbstractVertex) SetEdge(dst VertexInterface, ei EdgeInterface) {
 	v.RemoveAdjoin(dst)
 	v.Adjoin(dst, ei)
 }
 
 // increase indegree
-func (v *Vertex) incIndegree() {
+func (v *AbstractVertex) incIndegree() {
 	v.indegree++
 }
 
 // decrease indegree
-func (v *Vertex) decIndegree() {
+func (v *AbstractVertex) decIndegree() {
 	v.indegree--
 }
 
 // increase outdegree
-func (v *Vertex) incOutdegree() {
+func (v *AbstractVertex) incOutdegree() {
 	v.outdegree++
 }
 
 // decrease outdegree
-func (v *Vertex) decOutdegree() {
+func (v *AbstractVertex) decOutdegree() {
 	v.outdegree--
 }
 
 // delete adjacent vertex
-func (v *Vertex) RemoveAdjoin(vi VertexInterface) {
+func (v *AbstractVertex) RemoveAdjoin(vi VertexInterface) {
 	index := v.FindAdjoinVertex(vi)
 	if index == -1 {
 		return
@@ -176,7 +176,7 @@ func (v *Vertex) RemoveAdjoin(vi VertexInterface) {
 }
 
 // find adjacent vertex and return its binding edge's index
-func (v *Vertex) FindAdjoinVertex(vi VertexInterface) int {
+func (v *AbstractVertex) FindAdjoinVertex(vi VertexInterface) int {
 	for i, d := range v.edges.Data() {
 		e := d.(EdgeInterface)
 		if reflect.DeepEqual(e.Vertex(), vi) {
@@ -188,7 +188,7 @@ func (v *Vertex) FindAdjoinVertex(vi VertexInterface) int {
 }
 
 // get all edges
-func (v *Vertex) Edges() (ei []EdgeInterface) {
+func (v *AbstractVertex) Edges() (ei []EdgeInterface) {
 	for _, d := range v.edges.Data() {
 		ei = append(ei, d.(EdgeInterface))
 	}
@@ -197,11 +197,11 @@ func (v *Vertex) Edges() (ei []EdgeInterface) {
 }
 
 // Indegree
-func (v *Vertex) Indegree() int {
+func (v *AbstractVertex) Indegree() int {
 	return v.indegree
 }
 
 // outdegree
-func (v *Vertex) Outdegree() int {
+func (v *AbstractVertex) Outdegree() int {
 	return v.outdegree
 }
