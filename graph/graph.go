@@ -136,6 +136,7 @@ func (g *Graph) SetEdge(src, dst VertexInterface, ei EdgeInterface) error {
 // remove a vertex in graph, and those verteces which point to this vertex will also remove it
 func (g *Graph) RemoveVertex(v VertexInterface) {
 	for _, src := range g.verteces {
+		v.RemoveAdjoin(src)
 		src.RemoveAdjoin(v)
 	}
 	delete(g.verteces, v.Id())

@@ -59,3 +59,38 @@ func Test4Graph4Init(t *testing.T) {
 
 	GraphPrint(t, g)
 }
+
+func Test4Graph4Del(t *testing.T) {
+	t.Logf("testing for graph delete start.\n")
+	// new graph
+	g := NewGraph("Graph")
+	// new vertex
+	n0 := NewVertex("node0", 0)
+	n1 := NewVertex("node1", 1)
+	n2 := NewVertex("node2", 2)
+	n3 := NewVertex("node3", 3)
+	// add vertex
+	g.InsertVertex(n0)
+	g.InsertVertex(n1)
+	g.InsertVertex(n2)
+	g.InsertVertex(n3)
+	// add edge
+	g.InsertEdge(n0, n1, NewEdge())
+	g.InsertEdge(n0, n2, NewEdge())
+	g.InsertEdge(n1, n2, NewEdge())
+	g.InsertEdge(n2, n3, NewEdge())
+
+	t.Log("**********************init**************************")
+	GraphPrint(t, g)
+
+	t.Log("**********************remove vertex**************************")
+	g.RemoveVertex(n1)
+
+	GraphPrint(t, g)
+
+	t.Log("**********************remove edge**************************")
+	err := g.RemoveEdge(n0, n1)
+	if err != nil {
+		t.Log(err)
+	}
+}
