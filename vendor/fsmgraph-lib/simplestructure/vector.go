@@ -1,6 +1,9 @@
 package simplestructure
 
-import "sync"
+import (
+	"sync"
+	"reflect"
+)
 
 /***************************************** define vector interface *****************************************/
 
@@ -102,6 +105,16 @@ func (vec *SimpleVector) At(index int) interface{} {
 	return vec.data[index]
 }
 
+func (vec *SimpleVector) Find(v interface{}) int {
+	for i, d := range vec.data {
+		if reflect.DeepEqual(v, d) {
+			return i
+		}
+	}
+
+	return -1
+}
+
 func (vec *SimpleVector) Len() int {
 	defer vec.lock.RUnlock()
 
@@ -115,4 +128,8 @@ func (vec *SimpleVector) Iterator() Iterator {
 		vec:   vec,
 		index: 0,
 	}
+}
+
+func (vec *SimpleVector) Data() []interface{} {
+	return vec.data
 }

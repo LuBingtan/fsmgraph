@@ -1,53 +1,43 @@
 package graph
+
 import simpleSt "fsmgraph-lib/simplestructure"
-func (g *Graph) TopoSort() (sortVertexList []*Vertex, err error) {
-	indgreeList := []int{}
-	indexQueue := simpleSt.NewSimpleQueue()
 
-	// put all indegree in list
-	it := g.vertexVector.Iterator()
-	for {
-		next := it.Next()
-		if next == nil {
-			break
-		}
+func TopoSort(g *Graph) (sortVertexList []VertexInterface, err error) {
+	indgreeMap := make(map[string]int)
+	idQueue := simpleSt.NewSimpleQueue()
 
-		v := next.(*Vertex)
-		indgreeList = append(indgreeList, v.Indegree)
+	// put all indegree in map
+	verteces := g.Verteces()
+	for k, v := range verteces {
+		indgreeMap[k] = v.Indegree()
 	}
 
-	// find 0 indgree index
-	for i, d := range indgreeList {
+	// find 0 indgree id
+	for k, d := range indgreeMap {
 		if 0 == d {
-			indexQueue.Pushback(i)
+			idQueue.Pushback(k)
 		}
 	}
 
 	// 0 indgree adjoin vertex degree minus 1
-	// TODO: need to be more elegant
 	for {
-		// get index
-		p := indexQueue.Popfront()
-		if p == nil {
+		// get id
+		idInterface := idQueue.Popfront()
+		if idInterface == nil {
 			break
 		}
-		index := p.(int)
-		sortVertexList = append(sortVertexList, g.GetVertexByIndex(index))
+		id := idInterface.(string)
+		sortVertexList = append(sortVertexList, g.GetVertex(id))
 		// ge vertex
-		v := g.vertexVector.At(index).(*Vertex)
-		edge := v.OutEdge
-		for {
-			if nil == edge {
-				break
+		v := g.GetVertex(id)
+		edgeList := v.Edges()
+		for _, edge := range edgeList {
+			adjoinId := edge.Vertex().Id()
+			indgreeMap[adjoinId]--
+			if indgreeMap[adjoinId] == 0 {
+				idQueue.Pushback(adjoinId)
 			}
 
-			adjIndex := g.vertexMap[edge.AdjVertex.Id]
-			indgreeList[adjIndex]--
-			if 0 == indgreeList[adjIndex] {
-				indexQueue.Pushback(adjIndex)
-			}
-
-			edge = edge.NextEdge
 		}
 	}
 
@@ -55,7 +45,7 @@ func (g *Graph) TopoSort() (sortVertexList []*Vertex, err error) {
 }
 
 func (g *Graph) BFS(startPointId string) (sortVertexList []*Vertex) {
-	
+
 	return
 }
 
