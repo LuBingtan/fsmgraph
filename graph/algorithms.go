@@ -2,7 +2,7 @@ package graph
 
 import simpleSt "fsmgraph-lib/simplestructure"
 
-func TopoSort(g *Graph) (sortVertexList []VertexInterface, err error) {
+func TopoSort(g *AbstractGraph) (sortVertexList []VertexInterface, err error) {
 	indgreeMap := make(map[string]int)
 	idQueue := simpleSt.NewSimpleQueue()
 
@@ -42,13 +42,4 @@ func TopoSort(g *Graph) (sortVertexList []VertexInterface, err error) {
 	}
 
 	return sortVertexList, nil
-}
-
-func (g *Graph) BFS(startPointId string) (sortVertexList []*Vertex) {
-
-	return
-}
-
-func (g *Graph) DFS() (sortOut []*Vertex) {
-	return
 }

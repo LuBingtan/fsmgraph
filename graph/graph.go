@@ -33,41 +33,41 @@ type GraphInterface interface {
 }
 
 /*****************************************  graph struct  *****************************************/
-type Graph struct {
+type AbstractGraph struct {
 	name      string
 	graphType GraphType
 	verteces  map[string]VertexInterface
 }
 
-func NewGraph(name string) *Graph {
-	return &Graph{
+func NewGraph(name string) *AbstractGraph {
+	return &AbstractGraph{
 		name:     name,
 		verteces: make(map[string]VertexInterface),
 	}
 }
 
 // update graph name
-func (g *Graph) SetName(n string) {
+func (g *AbstractGraph) SetName(n string) {
 	g.name = n
 }
 
 // read graph name
-func (g *Graph) Name() string {
+func (g *AbstractGraph) Name() string {
 	return g.name
 }
 
 // update graph type
-func (g *Graph) SetType(t GraphType) {
+func (g *AbstractGraph) SetType(t GraphType) {
 	g.graphType = t
 }
 
 // read graph name
-func (g *Graph) Type() GraphType {
+func (g *AbstractGraph) Type() GraphType {
 	return g.graphType
 }
 
 // insert a new vertex
-func (g *Graph) InsertVertex(v VertexInterface) error {
+func (g *AbstractGraph) InsertVertex(v VertexInterface) error {
 	if _, ok := g.verteces[v.Id()]; ok {
 		return fmt.Errorf("vertex[id:%s] already exists!", v.Id())
 	}
@@ -78,7 +78,7 @@ func (g *Graph) InsertVertex(v VertexInterface) error {
 }
 
 // insert a new edge which is from src vertex to dst vertex
-func (g *Graph) InsertEdge(src, dst VertexInterface, ei EdgeInterface) error {
+func (g *AbstractGraph) InsertEdge(src, dst VertexInterface, ei EdgeInterface) error {
 	if _, ok := g.verteces[src.Id()]; !ok {
 		return fmt.Errorf("vertex[id:%s] not exists, insert vertex first!", src.Id())
 	}
@@ -93,7 +93,7 @@ func (g *Graph) InsertEdge(src, dst VertexInterface, ei EdgeInterface) error {
 }
 
 // get a vertex by id
-func (g *Graph) GetVertex(id string) VertexInterface {
+func (g *AbstractGraph) GetVertex(id string) VertexInterface {
 	v, ok := g.verteces[id]
 	if !ok {
 		return nil
@@ -103,12 +103,12 @@ func (g *Graph) GetVertex(id string) VertexInterface {
 }
 
 // get id-vertex map
-func (g *Graph) Verteces() map[string]VertexInterface {
+func (g *AbstractGraph) Verteces() map[string]VertexInterface {
 	return g.verteces
 }
 
 // update a vertex with specified id, and return an error if the id not exist
-func (g *Graph) SetVertex(v VertexInterface) error {
+func (g *AbstractGraph) SetVertex(v VertexInterface) error {
 	if _, ok := g.verteces[v.Id()]; !ok {
 		return fmt.Errorf("vertex[id:%s] not exists, insert vertex first!", v.Id())
 	}
@@ -119,7 +119,7 @@ func (g *Graph) SetVertex(v VertexInterface) error {
 }
 
 // update a edge which is from src verte to dst vertex
-func (g *Graph) SetEdge(src, dst VertexInterface, ei EdgeInterface) error {
+func (g *AbstractGraph) SetEdge(src, dst VertexInterface, ei EdgeInterface) error {
 	if _, ok := g.verteces[src.Id()]; !ok {
 		return fmt.Errorf("vertex[id:%s] not exists, insert vertex first!", src.Id())
 	}
@@ -134,7 +134,7 @@ func (g *Graph) SetEdge(src, dst VertexInterface, ei EdgeInterface) error {
 }
 
 // remove a vertex in graph, and those verteces which point to this vertex will also remove it
-func (g *Graph) RemoveVertex(v VertexInterface) {
+func (g *AbstractGraph) RemoveVertex(v VertexInterface) {
 	for _, src := range g.verteces {
 		v.RemoveAdjoin(src)
 		src.RemoveAdjoin(v)
@@ -143,7 +143,7 @@ func (g *Graph) RemoveVertex(v VertexInterface) {
 }
 
 // remove a edge in graph which is from src verte to dst vertex
-func (g *Graph) RemoveEdge(src, dst VertexInterface) error {
+func (g *AbstractGraph) RemoveEdge(src, dst VertexInterface) error {
 	if _, ok := g.verteces[src.Id()]; !ok {
 		return fmt.Errorf("vertex[id:%s] not exists, insert vertex first!", src.Id())
 	}

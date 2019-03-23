@@ -4,8 +4,8 @@ import (
 	"testing"
 )
 
-func GraphPrint(t *testing.T, g *Graph) {
-	t.Logf("Graph node number:%d\n", len(g.Verteces()))
+func GraphPrint(t *testing.T, g *AbstractGraph) {
+	t.Logf("AbstractGraph node number:%d\n", len(g.Verteces()))
 
 	t.Log("=======original=======")
 	for k, v := range g.Verteces() {
@@ -40,7 +40,7 @@ func GraphPrint(t *testing.T, g *Graph) {
 func Test4Graph4Init(t *testing.T) {
 	t.Logf("testing for graph initialize start.\n")
 	// new graph
-	g := NewGraph("Graph")
+	g := NewGraph("AbstractGraph")
 	// new vertex
 	n0 := NewVertex("node0", 0)
 	n1 := NewVertex("node1", 1)
@@ -63,7 +63,7 @@ func Test4Graph4Init(t *testing.T) {
 func Test4Graph4Del(t *testing.T) {
 	t.Logf("testing for graph delete start.\n")
 	// new graph
-	g := NewGraph("Graph")
+	g := NewGraph("AbstractGraph")
 	// new vertex
 	n0 := NewVertex("node0", 0)
 	n1 := NewVertex("node1", 1)
