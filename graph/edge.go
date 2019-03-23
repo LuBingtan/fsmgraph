@@ -29,7 +29,7 @@ type EdgeInterface interface {
 
 /*****************************************  edge struct  *****************************************/
 
-type Edge struct {
+type AbstractEdge struct {
 	// meta data
 	edgeType EdgeType
 	weight   int
@@ -38,38 +38,38 @@ type Edge struct {
 	vertex VertexInterface
 }
 
-func NewEdge() *Edge {
-	return &Edge{}
+func NewEdge() *AbstractEdge {
+	return &AbstractEdge{}
 }
 
-func (e *Edge) SetType(t EdgeType) {
+func (e *AbstractEdge) SetType(t EdgeType) {
 	e.edgeType = t
 }
 
-func (e *Edge) SetWeight(w int) {
+func (e *AbstractEdge) SetWeight(w int) {
 	e.weight = w
 }
 
-func (e *Edge) SetState(s EdgeState) {
+func (e *AbstractEdge) SetState(s EdgeState) {
 	e.state = s
 }
 
-func (e *Edge) Type() EdgeType {
+func (e *AbstractEdge) Type() EdgeType {
 	return e.edgeType
 }
 
-func (e *Edge) Weight() int {
+func (e *AbstractEdge) Weight() int {
 	return e.weight
 }
 
-func (e *Edge) State() EdgeState {
+func (e *AbstractEdge) State() EdgeState {
 	return e.state
 }
 
-func (e *Edge) SetVertex(v VertexInterface) {
+func (e *AbstractEdge) SetVertex(v VertexInterface) {
 	e.vertex = v
 }
 
-func (e *Edge) Vertex() VertexInterface {
+func (e *AbstractEdge) Vertex() VertexInterface {
 	return e.vertex
 }
