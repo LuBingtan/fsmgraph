@@ -1,6 +1,5 @@
 package graph
 
-
 /*****************************************  edge interface  *****************************************/
 
 // define for edge type
@@ -33,8 +32,8 @@ type EdgeInterface interface {
 type Edge struct {
 	// meta data
 	edgeType EdgeType
-	weight int
-	state EdgeState
+	weight   int
+	state    EdgeState
 	// graph data
 	vertex VertexInterface
 }

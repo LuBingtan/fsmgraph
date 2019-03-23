@@ -2,9 +2,10 @@ package graph
 
 import (
 	"fmt"
-	"reflect"
 	simpleSt "fsmgraph-lib/simplestructure"
+	"reflect"
 )
+
 /*****************************************  vertex interface  *****************************************/
 
 // define for vertex type
@@ -32,15 +33,22 @@ type VertexInterface interface {
 	// behavior
 	SetExecutor(ExecutorFunc)
 	Execute(...interface{}) (interface{}, error)
-	
+
 	/////// relation data ///////
 	// update
-	Adjoin(vi VertexInterface, ei EdgeInterface)
+	Adjoin(dst VertexInterface, ei EdgeInterface)
+	SetEdge(dst VertexInterface, ei EdgeInterface)
+	incIndegree()
+	decIndegree()
+	incOutdegree()
+	decOutdegree()
 	// delete
 	RemoveAdjoin(VertexInterface)
 	// read
 	FindAdjoinVertex(VertexInterface) int
 	Edges() []EdgeInterface
+	Indegree() int
+	Outdegree() int
 }
 
 /*****************************************  vertex struct  *****************************************/
@@ -50,18 +58,20 @@ type VertexInterface interface {
 type Vertex struct {
 	// meta data
 	vertexType VertexType
-	id   string
-	data interface{}
-	state VertexState
-	executor ExecutorFunc
+	id         string
+	data       interface{}
+	state      VertexState
+	executor   ExecutorFunc
 	// graph data
-	edges simpleSt.SimpleVector
+	edges     simpleSt.SimpleVector
+	indegree  int
+	outdegree int
 }
 
 func NewVertex(id string, data interface{}) *Vertex {
 	return &Vertex{
-		id:        id,
-		data:      data,
+		id:   id,
+		data: data,
 	}
 }
 
@@ -120,9 +130,37 @@ func (v *Vertex) Execute(inputs ...interface{}) (interface{}, error) {
 }
 
 // update adjacent vertex
-func (v *Vertex) Adjoin(vi VertexInterface, ei EdgeInterface) {
-	ei.SetVertex(vi)
-	v.edges.Pushback(ei)
+func (v *Vertex) Adjoin(dst VertexInterface, ei EdgeInterface) {
+	ei.SetVertex(dst)
+	v.edges.Pushback(dst)
+	v.incOutdegree()
+	dst.incIndegree()
+}
+
+// update edge
+func (v *Vertex) SetEdge(dst VertexInterface, ei EdgeInterface) {
+	v.RemoveAdjoin(dst)
+	v.Adjoin(dst, ei)
+}
+
+// increase indegree
+func (v *Vertex) incIndegree() {
+	v.indegree++
+}
+
+// decrease indegree
+func (v *Vertex) decIndegree() {
+	v.indegree--
+}
+
+// increase outdegree
+func (v *Vertex) incOutdegree() {
+	v.outdegree++
+}
+
+// decrease outdegree
+func (v *Vertex) decOutdegree() {
+	v.outdegree--
 }
 
 // delete adjacent vertex
@@ -133,12 +171,11 @@ func (v *Vertex) RemoveAdjoin(vi VertexInterface) {
 	}
 
 	v.edges.Remove(index)
-
-	if i := vi.FindAdjoinVertex(v); i != -1 {
-		vi.RemoveAdjoin(v)
-	}
+	v.decOutdegree()
+	vi.decIndegree()
 }
 
+// find adjacent vertex and return its binding edge's index
 func (v *Vertex) FindAdjoinVertex(vi VertexInterface) int {
 	for i, d := range v.edges.Data() {
 		e := d.(EdgeInterface)
@@ -157,4 +194,14 @@ func (v *Vertex) Edges() (ei []EdgeInterface) {
 	}
 
 	return ei
+}
+
+// Indegree
+func (v *Vertex) Indegree() int {
+	return v.indegree
+}
+
+// outdegree
+func (v *Vertex) Outdegree() int {
+	return v.outdegree
 }
