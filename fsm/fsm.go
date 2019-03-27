@@ -1,19 +1,12 @@
 package fsm
 
-/*****************************************  fsm interface  *****************************************/
+import (
+	"fsmgraph-lib/graph"
+)
 
-type FSMState string
-type FSMFunc func(interface{}) (interface{}, error)
-
-type FSM interface {
-	// create
-	AddState(state FSMState)
-	AddEvent(src, dst FSMState, f FSMFunc) error
-	// read
-	State() FSMState
-	NextStates() []FSMState
-	// delete
-	RemoveState(state FSMState)
-	// behavior
-	Trigger(target FSMState) error
+// struct FSM
+// A FSM is a graph, its' vertex is state. But a FSM is also a vertex for a 'FSMGraph'.
+type FSM struct {
+	graph.AbstractGraph
+	graph.AbstractVertex
 }
