@@ -1,7 +1,7 @@
 package fsm
 
 import (
-	"fsmgraph-lib/graph"
+	"graph/graph"
 )
 
 // struct FSMState
